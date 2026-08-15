@@ -94,4 +94,4 @@ EduVote Pro leverages a powerful Telegram Bot Integration to ensure the system c
 ---
 
 ## ⚠️ Disclaimer
-*This application was developed as a private, closed-source system for personal institutional use. Ensure you have proper authorization and consent before deploying this application in any real-world environment. Telegram Bot tokens and Chat IDs must be kept strictly confidential using environment variables.*
+*This application was developed as a private under the request of school management department, closed-source system for personal institutional/schools use. Ensure you have proper authorization and consent before deploying this application in any real-world environment.*
