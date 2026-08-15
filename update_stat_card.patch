@@ -1,0 +1,78 @@
+--- app/src/main/java/com/example/ui/screens/admin/AdminDashboardScreen.kt
++++ app/src/main/java/com/example/ui/screens/admin/AdminDashboardScreen.kt
+@@ -343,33 +343,36 @@
+ fun StatCard(label: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector, iconTint: Color, modifier: Modifier = Modifier) {
+     Card(
+-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
++        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+         shape = RoundedCornerShape(24.dp),
+-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+-        modifier = modifier.height(120.dp)
++        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
++        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
++        modifier = modifier.height(130.dp)
+     ) {
+-        Column(
+-            modifier = Modifier.fillMaxSize().padding(16.dp),
+-            horizontalAlignment = Alignment.Start,
+-            verticalArrangement = Arrangement.SpaceBetween
+-        ) {
+-            Row(
+-                modifier = Modifier.fillMaxWidth(),
+-                horizontalArrangement = Arrangement.SpaceBetween,
+-                verticalAlignment = Alignment.Top
+-            ) {
+-                Text(
+-                    label,
+-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+-                    fontSize = 14.sp,
+-                    fontWeight = FontWeight.Medium,
+-                    maxLines = 1,
+-                    overflow = TextOverflow.Ellipsis,
+-                    modifier = Modifier.weight(1f).padding(end = 4.dp)
+-                )
+-                Box(
+-                    modifier = Modifier.size(36.dp).background(iconTint.copy(alpha = 0.15f), shape = CircleShape),
+-                    contentAlignment = Alignment.Center
+-                ) {
+-                    Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
+-                }
+-            }
+-            Text(value, color = MaterialTheme.colorScheme.onSurface, fontSize = 34.sp, fontWeight = FontWeight.ExtraBold)
++        Box(
++            modifier = Modifier
++                .fillMaxSize()
++                .background(if (androidx.compose.foundation.isSystemInDarkTheme()) GradientSurfaceDark else GradientSurfaceLight)
++        ) {
++            Column(
++                modifier = Modifier.fillMaxSize().padding(20.dp),
++                horizontalAlignment = Alignment.Start,
++                verticalArrangement = Arrangement.SpaceBetween
++            ) {
++                Row(
++                    modifier = Modifier.fillMaxWidth(),
++                    horizontalArrangement = Arrangement.SpaceBetween,
++                    verticalAlignment = Alignment.Top
++                ) {
++                    Text(
++                        label,
++                        color = MaterialTheme.colorScheme.onSurfaceVariant,
++                        fontSize = 15.sp,
++                        fontWeight = FontWeight.SemiBold,
++                        maxLines = 1,
++                        overflow = TextOverflow.Ellipsis,
++                        modifier = Modifier.weight(1f).padding(end = 4.dp)
++                    )
++                    Box(
++                        modifier = Modifier.size(40.dp).background(iconTint.copy(alpha = 0.1f), shape = CircleShape),
++                        contentAlignment = Alignment.Center
++                    ) {
++                        Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(22.dp))
++                    }
++                }
++                Text(value, color = MaterialTheme.colorScheme.onSurface, fontSize = 36.sp, fontWeight = FontWeight.ExtraBold)
++            }
+         }
+     }
+ }
