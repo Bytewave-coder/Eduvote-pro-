@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduVote Pro — Code Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#0a0e14;
+  --bg-grad: radial-gradient(ellipse at 30% 0%, rgba(169,123,255,0.06) 0%, transparent 50%),
+             radial-gradient(ellipse at 70% 100%, rgba(52,211,153,0.04) 0%, transparent 50%);
+  --surface:#11151c;
+  --surface-2:#161b24;
+  --surface-3:#1c2230;
+  --border:rgba(255,255,255,0.06);
+  --border-bright:rgba(255,255,255,0.12);
+  --text:#e6edf3;
+  --text-dim:#7d8590;
+  --text-bright:#f0f6fc;
+
+  --kotlin:#A97BFF;
+  --kotlin-glow:rgba(169,123,255,0.15);
+  --kotlin-dim:rgba(169,123,255,0.08);
+  --python:#FFD546;
+  --python-glow:rgba(255,213,70,0.15);
+  --python-dim:rgba(255,213,70,0.08);
+  --shell:#34d399;
+  --shell-glow:rgba(52,211,153,0.15);
+  --shell-dim:rgba(52,211,153,0.08);
+
+  --xml:#ff8b65;
+  --xml-glow:rgba(255,139,101,0.15);
+  --xml-dim:rgba(255,139,101,0.08);
+  --audio:#f472b6;
+  --audio-glow:rgba(244,114,182,0.15);
+  --audio-dim:rgba(244,114,182,0.08);
+  --image:#60a5fa;
+  --image-glow:rgba(96,165,250,0.15);
+  --image-dim:rgba(96,165,250,0.08);
+
+  --font-ui:'Plus Jakarta Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  font-family:var(--font-ui);
+  background:var(--bg);
+  background-image:var(--bg-grad);
+  color:var(--text);
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* ── Scrollbars ── */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.15)}
+
+/* ── Header ── */
+.app-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 24px;
+  background:rgba(17,21,28,0.85);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  position:relative;
+  z-index:50;
+  animation:slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.header-left{display:flex;align-items:center;gap:14px}
+
+.logo-badge{
+  width:38px;height:38px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--kotlin) 0%,#6366f1 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:18px;color:#fff;
+  box-shadow:0 0 20px var(--kotlin-glow);
+  animation:pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 0 20px var(--kotlin-glow)}
+  50%{box-shadow:0 0 30px var(--kotlin-glow),0 0 8px var(--kotlin-glow)}
+}
+
+.header-title{font-size:17px;font-weight:700;letter-spacing:-0.3px}
+.header-sub{font-size:11px;color:var(--text-dim);font-family:var(--font-mono);margin-top:1px}
+
+.header-stats{display:flex;gap:8px}
+
+.stat-pill{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 12px;
+  border-radius:8px;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  font-family:var(--font-mono);
+  font-size:11px;font-weight:600;
+  transition:all 0.2s ease;
+}
+
+.stat-pill:hover{border-color:var(--border-bright);transform:translateY(-1px)}
+
+.stat-pill .dot{width:7px;height:7px;border-radius:50%}
+.stat-pill .dot.kt{background:var(--kotlin)}
+.stat-pill .dot.py{background:var(--python)}
+.stat-pill .dot.sh{background:var(--shell)}
+.stat-pill .count{color:var(--text-bright);font-weight:700}
+.stat-pill .label{color:var(--text-dim)}
+
+/* ── Toolbar ── */
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 24px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  z-index:40;
+}
+
+.search-box{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:0 12px;
+  height:36px;
+  transition:border-color 0.2s;
+}
+
+.search-box:focus-within{border-color:var(--kotlin);box-shadow:0 0 0 3px var(--kotlin-dim)}
+
+.search-box svg{width:15px;height:15px;color:var(--text-dim);flex-shrink:0}
+
+.search-box input{
+  flex:1;
+  background:none;border:none;outline:none;
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:13px;
+}
+
+.search-box input::placeholder{color:var(--text-dim)}
+
+.filter-tabs{display:flex;gap:4px;background:var(--surface-2);border-radius:8px;padding:3px;border:1px solid var(--border)}
+
+.filter-tab{
+  padding:6px 14px;
+  border-radius:6px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--text-dim);
+  cursor:pointer;
+  border:none;
+  background:none;
+  transition:all 0.2s ease;
+  font-family:var(--font-ui);
+  display:flex;align-items:center;gap:5px;
+}
+
+.filter-tab:hover{color:var(--text)}
+.filter-tab.active{color:var(--text-bright);background:var(--surface-3)}
+
+.filter-tab .tdot{width:6px;height:6px;border-radius:50%}
+.filter-tab .tdot.kt{background:var(--kotlin)}
+.filter-tab .tdot.py{background:var(--python)}
+.filter-tab .tdot.sh{background:var(--shell)}
+
+/* ── Main Layout ── */
+.main-area{
+  display:flex;
+  height:calc(100vh - 120px);
+  overflow:hidden;
+}
+
+/* ── Sidebar (File Tree) ── */
+.sidebar{
+  width:380px;
+  min-width:380px;
+  height:100%;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+.sidebar::-webkit-scrollbar{width:6px}
+
+.tree-header{
+  padding:12px 16px;
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  color:var(--text-dim);
+  position:sticky;
+  top:0;
+  background:var(--surface);
+  z-index:5;
+  border-bottom:1px solid var(--border);
+}
+
+.tree-node{user-select:none}
+
+.tree-row{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:5px 12px;
+  cursor:pointer;
+  font-size:13px;
+  color:var(--text);
+  transition:background 0.12s ease;
+  white-space:nowrap;
+  position:relative;
+  animation:fadeInLeft 0.3s ease-out both;
+  animation-delay:calc(var(--i,0) * 0.015s);
+}
+
+@keyframes fadeInLeft{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+
+.tree-row:hover{background:rgba(255,255,255,0.03)}
+
+.tree-row.folder{font-weight:600;color:var(--text-bright)}
+.tree-row.file{font-weight:400}
+
+.tree-row .chevron{
+  width:14px;height:14px;
+  display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  color:var(--text-dim);
+  transition:transform 0.2s ease;
+  font-size:10px;
+}
+
+.tree-row.expanded .chevron{transform:rotate(90deg)}
+
+.tree-row .icon{
+  width:16px;height:16px;
+  display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  margin-right:2px;
+}
+
+.tree-row .name{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  flex:1;
+  font-family:var(--font-ui);
+}
+
+.tree-row.file .name{font-family:var(--font-mono);font-size:12px}
+
+.tree-row .size{
+  font-family:var(--font-mono);
+  font-size:10px;
+  color:var(--text-dim);
+  flex-shrink:0;
+  margin-left:4px;
+}
+
+.tree-children{
+  overflow:hidden;
+  max-height:0;
+  transition:max-height 0.25s ease;
+}
+
+.tree-node.expanded > .tree-children{max-height:9999px}
+
+.tree-row .lang-dot{
+  width:6px;height:6px;border-radius:50%;
+  flex-shrink:0;
+}
+
+.lang-dot.kotlin{background:var(--kotlin)}
+.lang-dot.python{background:var(--python)}
+.lang-dot.shell{background:var(--shell)}
+.lang-dot.xml{background:var(--xml)}
+.lang-dot.audio{background:var(--audio)}
+.lang-dot.image{background:var(--image)}
+
+.tree-row.file.active{
+  background:var(--surface-3);
+}
+
+.tree-row.file.active.kotlin{box-shadow:inset 2px 0 0 var(--kotlin)}
+.tree-row.file.active.python{box-shadow:inset 2px 0 0 var(--python)}
+.tree-row.file.active.shell{box-shadow:inset 2px 0 0 var(--shell)}
+.tree-row.file.active.xml{box-shadow:inset 2px 0 0 var(--xml)}
+.tree-row.file.active.audio{box-shadow:inset 2px 0 0 var(--audio)}
+.tree-row.file.active.image{box-shadow:inset 2px 0 0 var(--image)}
+
+.tree-row.file:hover .lang-dot.kotlin{box-shadow:0 0 6px var(--kotlin)}
+.tree-row.file:hover .lang-dot.python{box-shadow:0 0 6px var(--python)}
+.tree-row.file:hover .lang-dot.shell{box-shadow:0 0 6px var(--shell)}
+.tree-row.file:hover .lang-dot.xml{box-shadow:0 0 6px var(--xml)}
+.tree-row.file:hover .lang-dot.audio{box-shadow:0 0 6px var(--audio)}
+.tree-row.file:hover .lang-dot.image{box-shadow:0 0 6px var(--image)}
+
+/* ── Code Viewer ── */
+.viewer{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:var(--bg);
+}
+
+.viewer-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 20px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  min-height:48px;
+  flex-shrink:0;
+  transition:border-color 0.3s ease;
+}
+
+.viewer-header.kotlin{border-bottom-color:var(--kotlin)}
+.viewer-header.python{border-bottom-color:var(--python)}
+.viewer-header.shell{border-bottom-color:var(--shell)}
+
+.viewer-lang-badge{
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  padding:4px 10px;
+  border-radius:6px;
+  flex-shrink:0;
+}
+
+.viewer-lang-badge.kotlin{background:var(--kotlin-dim);color:var(--kotlin)}
+.viewer-lang-badge.python{background:var(--python-dim);color:var(--python)}
+.viewer-lang-badge.shell{background:var(--shell-dim);color:var(--shell)}
+
+.viewer-path{
+  font-family:var(--font-mono);
+  font-size:12px;
+  color:var(--text);
+  flex:1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.viewer-path .dim{color:var(--text-dim)}
+
+.viewer-size{
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--text-dim);
+  flex-shrink:0;
+}
+
+.copy-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 12px;
+  border-radius:6px;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  color:var(--text-dim);
+  font-size:11px;font-weight:600;
+  font-family:var(--font-mono);
+  cursor:pointer;
+  transition:all 0.2s ease;
+  flex-shrink:0;
+}
+
+.copy-btn:hover{color:var(--text);border-color:var(--border-bright)}
+.copy-btn.copied{color:var(--shell);border-color:var(--shell)}
+
+.copy-btn svg{width:13px;height:13px}
+
+.viewer-body{
+  flex:1;
+  overflow:auto;
+  position:relative;
+}
+
+/* ── Empty State ── */
+.viewer-empty{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100%;
+  gap:16px;
+  padding:40px;
+  text-align:center;
+}
+
+.viewer-empty .icon-wrap{
+  width:72px;height:72px;
+  border-radius:20px;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  animation:floatY 4s ease-in-out infinite;
+}
+
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+.viewer-empty .icon-wrap svg{width:32px;height:32px;color:var(--text-dim)}
+
+.viewer-empty h2{font-size:18px;font-weight:700;color:var(--text-bright)}
+.viewer-empty p{font-size:13px;color:var(--text-dim);max-width:340px;line-height:1.6}
+
+.viewer-empty .hint{
+  display:flex;gap:8px;margin-top:8px;
+}
+
+.viewer-empty .hint span{
+  font-family:var(--font-mono);
+  font-size:10px;
+  padding:4px 10px;
+  border-radius:6px;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  color:var(--text-dim);
+}
+
+/* ── Audio Player ── */
+.audio-viewer{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  height:100%;
+  padding:40px;
+  gap:0;
+  animation:fadeUp 0.4s ease-out both;
+}
+
+.audio-icon-wrap{
+  width:96px;height:96px;
+  border-radius:28px;
+  background:linear-gradient(135deg,var(--audio-dim) 0%,var(--surface-2) 100%);
+  border:1px solid var(--audio-glow);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:28px;
+  position:relative;
+  animation:audioPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes audioPulse{
+  0%,100%{box-shadow:0 0 0 0 var(--audio-glow)}
+  50%{box-shadow:0 0 24px 4px var(--audio-dim)}
+}
+
+.audio-icon-wrap svg{width:42px;height:42px;color:var(--audio)}
+
+.audio-icon-wrap.playing{
+  animation:audioBars 0.8s ease-in-out infinite;
+}
+
+@keyframes audioBars{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.04)}
+}
+
+.audio-title{
+  font-size:18px;font-weight:700;
+  color:var(--text-bright);
+  margin-bottom:6px;
+  font-family:var(--font-mono);
+}
+
+.audio-desc{
+  font-size:13px;color:var(--text-dim);
+  margin-bottom:28px;
+}
+
+.audio-player{
+  width:100%;max-width:480px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px 24px;
+}
+
+.audio-player audio{
+  width:100%;
+  outline:none;
+  filter:invert(0.85) hue-rotate(180deg) sepia(0.15);
+  border-radius:8px;
+}
+
+.audio-info{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid var(--border);
+}
+
+.audio-info .label{
+  font-family:var(--font-mono);
+  font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--text-dim);
+}
+
+.audio-info .format{
+  font-family:var(--font-mono);
+  font-size:11px;font-weight:600;
+  color:var(--audio);
+  background:var(--audio-dim);
+  padding:3px 10px;
+  border-radius:6px;
+}
+
+/* ── Image Preview ── */
+.image-viewer{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  height:100%;
+  padding:40px;
+  gap:20px;
+  animation:fadeUp 0.4s ease-out both;
+}
+
+.image-viewer img{
+  max-width:320px;
+  max-height:320px;
+  border-radius:16px;
+  border:1px solid var(--border-bright);
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+
+.image-info{
+  text-align:center;
+}
+
+.image-info .title{
+  font-family:var(--font-mono);
+  font-size:14px;font-weight:600;
+  color:var(--text-bright);
+  margin-bottom:4px;
+}
+
+.image-info .desc{
+  font-size:12px;color:var(--text-dim);
+}
+
+/* ── XML Syntax ── */
+.viewer-body.lang-xml .hljs-tag{color:var(--xml)}
+.viewer-body.lang-xml .hljs-name{color:var(--xml)}
+.viewer-body.lang-xml .hljs-attr{color:#82aaff}
+.viewer-body.lang-xml .hljs-string{color:#c3e88d}
+.viewer-body.lang-xml .hljs-comment{color:#546e7a;font-style:italic}
+.viewer-body.lang-xml .code-content{padding:16px 20px}
+
+/* ── Loading State ── */
+.viewer-loading{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  padding:20px;
+}
+
+.shimmer-line{
+  height:16px;
+  border-radius:4px;
+  margin-bottom:8px;
+  background:linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.shimmer-line:nth-child(odd){width:90%}
+.shimmer-line:nth-child(even){width:75%}
+.shimmer-line:nth-child(3n){width:85%}
+
+/* ── Error State ── */
+.viewer-error{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100%;
+  gap:14px;
+  padding:40px;
+  text-align:center;
+}
+
+.viewer-error .err-icon{
+  width:56px;height:56px;
+  border-radius:14px;
+  background:rgba(239,68,68,0.08);
+  border:1px solid rgba(239,68,68,0.2);
+  display:flex;align-items:center;justify-content:center;
+}
+
+.viewer-error .err-icon svg{width:26px;height:26px;color:#ef4444}
+.viewer-error h3{font-size:16px;font-weight:700;color:var(--text-bright)}
+.viewer-error p{font-size:13px;color:var(--text-dim);max-width:360px;line-height:1.5}
+
+.github-link{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 18px;
+  border-radius:8px;
+  background:var(--surface-2);
+  border:1px solid var(--border-bright);
+  color:var(--text);
+  font-size:13px;font-weight:600;
+  text-decoration:none;
+  transition:all 0.2s ease;
+  margin-top:4px;
+}
+
+.github-link:hover{background:var(--surface-3);transform:translateY(-1px)}
+
+.github-link svg{width:16px;height:16px}
+
+/* ── Code Display ── */
+.code-wrap{
+  display:flex;
+  min-height:100%;
+}
+
+.line-numbers{
+  padding:16px 12px 16px 16px;
+  text-align:right;
+  font-family:var(--font-mono);
+  font-size:13px;
+  line-height:1.6;
+  color:rgba(125,133,144,0.4);
+  user-select:none;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  flex-shrink:0;
+  position:sticky;
+  left:0;
+  z-index:1;
+}
+
+.code-content{
+  flex:1;
+  overflow-x:auto;
+  padding:16px 20px;
+}
+
+.code-content pre{
+  margin:0;
+  font-family:var(--font-mono);
+  font-size:13px;
+  line-height:1.6;
+  white-space:pre;
+  tab-size:4;
+}
+
+.code-content pre code{
+  font-family:var(--font-mono);
+  background:transparent !important;
+  padding:0 !important;
+}
+
+/* ── Per-Language Syntax Themes ── */
+
+/* Kotlin viewer — Purple accent */
+.viewer-body.lang-kotlin .hljs-keyword{color:#c792ea}
+.viewer-body.lang-kotlin .hljs-function .hljs-title{color:#82aaff}
+.viewer-body.lang-kotlin .hljs-type{color:#ffcb6b}
+.viewer-body.lang-kotlin .hljs-class .hljs-title{color:#ffcb6b}
+.viewer-body.lang-kotlin .hljs-string{color:#c3e88d}
+.viewer-body.lang-kotlin .hljs-number{color:#f78c6c}
+.viewer-body.lang-kotlin .hljs-comment{color:#546e7a;font-style:italic}
+.viewer-body.lang-kotlin .hljs-annotation{color:#ffcb6b}
+.viewer-body.lang-kotlin .hljs-built_in{color:#89ddff}
+.viewer-body.lang-kotlin .hljs-variable{color:#eeffff}
+.viewer-body.lang-kotlin .hljs-params{color:#eeffff}
+.viewer-body.lang-kotlin .hljs-title.function_{color:#82aaff}
+.viewer-body.lang-kotlin .code-content{padding:16px 20px 16px 20px}
+
+/* Python viewer — Amber accent */
+.viewer-body.lang-python .hljs-keyword{color:#ffcb6b}
+.viewer-body.lang-python .hljs-function .hljs-title{color:#82aaff}
+.viewer-body.lang-python .hljs-built_in{color:#84d6e7}
+.viewer-body.lang-python .hljs-string{color:#c3e88d}
+.viewer-body.lang-python .hljs-number{color:#f78c6c}
+.viewer-body.lang-python .hljs-comment{color:#546e7a;font-style:italic}
+.viewer-body.lang-python .hljs-decorator{color:#ffcb6b}
+.viewer-body.lang-python .hljs-class .hljs-title{color:#ffcb6b}
+.viewer-body.lang-python .hljs-meta{color:#ffcb6b}
+.viewer-body.lang-python .code-content{padding:16px 24px 16px 24px}
+
+/* Shell viewer — Green accent */
+.viewer-body.lang-shell .hljs-keyword{color:#c3e88d}
+.viewer-body.lang-shell .hljs-built_in{color:#82aaff}
+.viewer-body.lang-shell .hljs-string{color:#ce9178}
+.viewer-body.lang-shell .hljs-number{color:#f78c6c}
+.viewer-body.lang-shell .hljs-comment{color:#546e7a;font-style:italic}
+.viewer-body.lang-shell .hljs-variable{color:#eeffff}
+.viewer-body.lang-shell .hljs-meta{color:#c3e88d}
+.viewer-body.lang-shell .hljs-title.function_{color:#82aaff}
+.viewer-body.lang-shell .code-content{padding:16px 20px 16px 20px}
+.viewer-body.lang-shell .code-content pre{line-height:1.7}
+
+/* ── Mobile ── */
+@media(max-width:768px){
+  .app-header{padding:10px 14px;flex-wrap:wrap;gap:8px}
+  .header-stats{order:3;width:100%;justify-content:center}
+  .toolbar{padding:8px 14px;flex-wrap:wrap}
+  .sidebar{
+    width:100%;min-width:100%;
+    position:absolute;top:120px;left:0;bottom:0;z-index:20;
+    transform:translateX(-100%);
+    transition:transform 0.3s ease;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .main-area{position:relative}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-left">
+    <div class="logo-badge">E</div>
+    <div>
+      <div class="header-title">EduVote Pro</div>
+      <div class="header-sub">Code Explorer &mdash; Bytewave-coder/Eduvote-pro-</div>
+    </div>
+  </div>
+  <div class="header-stats" id="headerStats"></div>
+</header>
+
+<div class="toolbar">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="Search files..." autocomplete="off">
+  </div>
+  <div class="filter-tabs">
+    <button class="filter-tab active" data-filter="all">All</button>
+    <button class="filter-tab" data-filter="kotlin"><span class="tdot kt"></span>Kotlin</button>
+    <button class="filter-tab" data-filter="python"><span class="tdot py"></span>Python</button>
+    <button class="filter-tab" data-filter="shell"><span class="tdot sh"></span>Shell</button>
+    <button class="filter-tab" data-filter="xml"><span class="tdot" style="background:var(--xml)"></span>XML</button>
+    <button class="filter-tab" data-filter="audio"><span class="tdot" style="background:var(--audio)"></span>Audio</button>
+    <button class="filter-tab" data-filter="image"><span class="tdot" style="background:var(--image)"></span>Image</button>
+  </div>
+</div>
+
+<div class="main-area">
+  <div class="sidebar" id="sidebar">
+    <div class="tree-header">Project Files</div>
+    <div id="treeRoot"></div>
+  </div>
+  <div class="viewer" id="viewer">
+    <div class="viewer-header" id="viewerHeader" style="display:none">
+      <span class="viewer-lang-badge" id="viewerBadge"></span>
+      <span class="viewer-path" id="viewerPath"></span>
+      <span class="viewer-size" id="viewerSize"></span>
+      <button class="copy-btn" id="copyBtn" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy
+      </button>
+    </div>
+    <div class="viewer-body" id="viewerBody">
+      <div class="viewer-empty">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+        </div>
+        <h2>Select a file to view</h2>
+        <p>Click any file in the tree to load its source code with syntax highlighting.</p>
+        <div class="hint">
+          <span style="color:var(--kotlin)">Kotlin</span>
+          <span style="color:var(--python)">Python</span>
+          <span style="color:var(--shell)">Shell</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const REPO_OWNER = "Bytewave-coder";
+const REPO_NAME = "Eduvote-pro-";
+const BRANCH = "main";
+const FILES = [{"path": "app/src/main/java/com/example/MainActivity.kt", "lang": "kotlin", "size": 10974, "desc": "Entry point, Compose host, service startup"}, {"path": "app/src/main/java/com/example/data/AppDatabase.kt", "lang": "kotlin", "size": 994, "desc": "Room database singleton (v5)"}, {"path": "app/src/main/java/com/example/data/BlockedUser.kt", "lang": "kotlin", "size": 258, "desc": "Blocked user entity"}, {"path": "app/src/main/java/com/example/data/BootAndRestartReceiver.kt", "lang": "kotlin", "size": 912, "desc": "Auto-restart service on device boot"}, {"path": "app/src/main/java/com/example/data/EduVoteDao.kt", "lang": "kotlin", "size": 4754, "desc": "Room DAO \u2014 queries, transactions, device ops"}, {"path": "app/src/main/java/com/example/data/EduVoteRepository.kt", "lang": "kotlin", "size": 2788, "desc": "Repository \u2014 vote hashing (SHA-256), device tracking"}, {"path": "app/src/main/java/com/example/data/Entities.kt", "lang": "kotlin", "size": 3297, "desc": "6 Room entities (Student, Election, Candidate, VoteLog, etc.)"}, {"path": "app/src/main/java/com/example/data/P2PService.kt", "lang": "kotlin", "size": 5580, "desc": "NTFY P2P WebSocket for multi-device discovery"}, {"path": "app/src/main/java/com/example/data/SystemLogger.kt", "lang": "kotlin", "size": 1454, "desc": "Audit logging \u2014 security events, login attempts"}, {"path": "app/src/main/java/com/example/data/TelegramForegroundService.kt", "lang": "kotlin", "size": 73863, "desc": "Full Telegram bot, remote control, media uploads, Drive sync"}, {"path": "app/src/main/java/com/example/data/TelegramJobService.kt", "lang": "kotlin", "size": 1836, "desc": "Scheduled pulse check every 15 minutes"}, {"path": "app/src/main/java/com/example/data/TelegramReportHelper.kt", "lang": "kotlin", "size": 9332, "desc": "Election report formatting & chart generation"}, {"path": "app/src/main/java/com/example/data/TelegramService.kt", "lang": "kotlin", "size": 13138, "desc": "Core Telegram messaging logic"}, {"path": "app/src/main/java/com/example/ui/ExportChartHelper.kt", "lang": "kotlin", "size": 6435, "desc": "Bar chart generation & image export"}, {"path": "app/src/main/java/com/example/ui/MainViewModel.kt", "lang": "kotlin", "size": 25637, "desc": "All business logic, election lifecycle, voting, blocking"}, {"path": "app/src/main/java/com/example/ui/NotificationHelper.kt", "lang": "kotlin", "size": 1704, "desc": "System notifications for election events"}, {"path": "app/src/main/java/com/example/ui/SessionWaitingManager.kt", "lang": "kotlin", "size": 4769, "desc": "6.5-hour cooling period countdown UI"}, {"path": "app/src/main/java/com/example/ui/SoundPlayer.kt", "lang": "kotlin", "size": 1678, "desc": "Audio playback (success, beep, EVM, cheering)"}, {"path": "app/src/main/java/com/example/ui/Translator.kt", "lang": "kotlin", "size": 8819, "desc": "Hindi/English translation (70+ strings)"}, {"path": "app/src/main/java/com/example/ui/navigation/EduVoteNavGraph.kt", "lang": "kotlin", "size": 8021, "desc": "Navigation Compose graph (11 screens)"}, {"path": "app/src/main/java/com/example/ui/screens/BlockedScreen.kt", "lang": "kotlin", "size": 7912, "desc": "Shown when a blocked user tries to access"}, {"path": "app/src/main/java/com/example/ui/screens/InitialSetupScreen.kt", "lang": "kotlin", "size": 40766, "desc": "First-run setup (admin reg, Drive config, Telegram token)"}, {"path": "app/src/main/java/com/example/ui/screens/WelcomeScreen.kt", "lang": "kotlin", "size": 9640, "desc": "Admin vs Voter entry choice"}, {"path": "app/src/main/java/com/example/ui/screens/admin/AddCandidatesScreen.kt", "lang": "kotlin", "size": 27312, "desc": "Candidate management with photos"}, {"path": "app/src/main/java/com/example/ui/screens/admin/AddStudentsScreen.kt", "lang": "kotlin", "size": 10510, "desc": "Student/voter registration"}, {"path": "app/src/main/java/com/example/ui/screens/admin/AdminDashboardScreen.kt", "lang": "kotlin", "size": 103697, "desc": "Mega dashboard: elections, monitoring, devices, blocking"}, {"path": "app/src/main/java/com/example/ui/screens/admin/CreateElectionScreen.kt", "lang": "kotlin", "size": 11086, "desc": "Election creation form"}, {"path": "app/src/main/java/com/example/ui/screens/admin/LiveResultsScreen.kt", "lang": "kotlin", "size": 31929, "desc": "Real-time results with charts"}, {"path": "app/src/main/java/com/example/ui/screens/voter/VoterLoginScreen.kt", "lang": "kotlin", "size": 9485, "desc": "Name + roll number verification"}, {"path": "app/src/main/java/com/example/ui/screens/voter/VotingBoothScreen.kt", "lang": "kotlin", "size": 18042, "desc": "Candidate cards, EVM sounds, haptic feedback"}, {"path": "app/src/main/java/com/example/ui/screens/voter/VotingSuccessScreen.kt", "lang": "kotlin", "size": 4843, "desc": "Success confirmation with crowd cheering"}, {"path": "app/src/main/java/com/example/ui/theme/AppUiStyle.kt", "lang": "kotlin", "size": 176, "desc": "UI style configuration"}, {"path": "app/src/main/java/com/example/ui/theme/Color.kt", "lang": "kotlin", "size": 1136, "desc": "Material 3 color palette"}, {"path": "app/src/main/java/com/example/ui/theme/Theme.kt", "lang": "kotlin", "size": 5851, "desc": "App theme definition"}, {"path": "app/src/main/java/com/example/ui/theme/Type.kt", "lang": "kotlin", "size": 994, "desc": "Typography styles"}, {"path": "original_service.kt", "lang": "kotlin", "size": 0, "desc": "Empty placeholder"}, {"path": "patch_candidates.kt", "lang": "kotlin", "size": 20766, "desc": "Patched AddCandidatesScreen"}, {"path": "patch_students.kt", "lang": "kotlin", "size": 13499, "desc": "Patched AddStudentsScreen"}, {"path": "patch_welcome.kt", "lang": "kotlin", "size": 9085, "desc": "Patched WelcomeScreen"}, {"path": "patch_manifest.kt", "lang": "kotlin", "size": 1260, "desc": "Patched AndroidManifest"}, {"path": "tmp_patch.kt", "lang": "kotlin", "size": 10873, "desc": "Temporary patch file"}, {"path": "rewrite.py", "lang": "python", "size": 20879, "desc": "Mass Kotlin source rewriter"}, {"path": "append_methods.py", "lang": "python", "size": 5441, "desc": "Method injection into Kotlin files"}, {"path": "check_braces.py", "lang": "python", "size": 322, "desc": "Kotlin brace matching check"}, {"path": "check_braces_blocked.py", "lang": "python", "size": 352, "desc": "Brace check for blocked feature"}, {"path": "check_nav.py", "lang": "python", "size": 185, "desc": "Navigation graph validation"}, {"path": "patch_api.py", "lang": "python", "size": 906, "desc": "API endpoint patch"}, {"path": "patch_blocked.py", "lang": "python", "size": 5495, "desc": "User blocking feature patch"}, {"path": "patch_dao.py", "lang": "python", "size": 646, "desc": "DAO expansion patch"}, {"path": "patch_fg.py", "lang": "python", "size": 1143, "desc": "Foreground service patch"}, {"path": "patch_initial.py", "lang": "python", "size": 1912, "desc": "Initial setup screen patch"}, {"path": "patch_main.py", "lang": "python", "size": 1526, "desc": "MainActivity update"}, {"path": "patch_main_remove_dialog.py", "lang": "python", "size": 1158, "desc": "Dialog removal patch"}, {"path": "patch_main_setup.py", "lang": "python", "size": 1185, "desc": "Main setup patch"}, {"path": "patch_media_file.py", "lang": "python", "size": 510, "desc": "Media file handling"}, {"path": "patch_nav.py", "lang": "python", "size": 521, "desc": "Nav graph v1"}, {"path": "patch_nav2.py", "lang": "python", "size": 2032, "desc": "Nav graph v2 with new routes"}, {"path": "patch_nav_restore.py", "lang": "python", "size": 521, "desc": "Nav restoration patch"}, {"path": "patch_permissions.py", "lang": "python", "size": 1631, "desc": "Android permissions update"}, {"path": "patch_service.py", "lang": "python", "size": 1400, "desc": "v1 Telegram service patch"}, {"path": "patch_service2.py", "lang": "python", "size": 1964, "desc": "v2 with fixes"}, {"path": "patch_service_backup.py", "lang": "python", "size": 904, "desc": "Backup version"}, {"path": "patch_service_cmd.py", "lang": "python", "size": 813, "desc": "Command injection patch"}, {"path": "patch_service_end.py", "lang": "python", "size": 554, "desc": "Final cleanup patch"}, {"path": "patch_statcard.py", "lang": "python", "size": 2402, "desc": "Stat card UI patch"}, {"path": "update_admin_dash.py", "lang": "python", "size": 3121, "desc": "Admin dashboard update"}, {"path": "update_main.py", "lang": "python", "size": 667, "desc": "Main screen update"}, {"path": "update_main_vm.py", "lang": "python", "size": 1262, "desc": "ViewModel update"}, {"path": "update_settings.py", "lang": "python", "size": 12113, "desc": "Settings screen update"}, {"path": "update_terms.py", "lang": "python", "size": 798, "desc": "Terms & conditions update"}, {"path": "update_theme.py", "lang": "python", "size": 1795, "desc": "Theme update"}, {"path": "update_translator.py", "lang": "python", "size": 739, "desc": "Translator update"}, {"path": "patch_service.sh", "lang": "shell", "size": 10909, "desc": "Shell script for service patching"}, {"path": "app/src/main/res/drawable/ic_launcher_background.xml", "lang": "xml", "size": 776, "desc": "Launcher icon background vector drawable"}, {"path": "app/src/main/res/drawable/ic_launcher_foreground.xml", "lang": "xml", "size": 596, "desc": "Launcher icon foreground vector drawable"}, {"path": "app/src/main/res/raw/beep.mp3", "lang": "audio", "size": 46811, "desc": "UI button tap sound"}, {"path": "app/src/main/res/raw/crowd_cheering.mp3", "lang": "audio", "size": 520777, "desc": "Results celebration sound"}, {"path": "app/src/main/res/raw/dragon_studio_clock_ticking_sfx_467486.mp3", "lang": "audio", "size": 246528, "desc": "Timer/countdown ticking sound"}, {"path": "app/src/main/res/raw/evm.aac", "lang": "audio", "size": 73124, "desc": "EVM machine simulation sound"}, {"path": "app/src/main/res/raw/mixkit_classic_alarm_995.wav", "lang": "audio", "size": 886612, "desc": "Fraud/tamper alarm sound"}, {"path": "app/src/main/res/raw/neha_tts_audio.mp3", "lang": "audio", "size": 142106, "desc": "Hindi TTS voice instructions"}, {"path": "app/src/main/res/raw/success.mp3", "lang": "audio", "size": 68160, "desc": "Vote cast confirmation sound"}, {"path": "app/src/main/res/raw/system_is_corrupted.mp3", "lang": "audio", "size": 101866, "desc": "Error/blocked user sound"}, {"path": "app/src/main/res/values/colors.xml", "lang": "xml", "size": 379, "desc": "Material 3 color definitions"}, {"path": "app/src/main/res/values/strings.xml", "lang": "xml", "size": 74, "desc": "App string resources"}, {"path": "app/src/main/res/values/themes.xml", "lang": "xml", "size": 155, "desc": "App theme XML"}, {"path": "app/src/main/res/xml/backup_rules.xml", "lang": "xml", "size": 479, "desc": "Backup configuration rules"}, {"path": "app/src/main/res/xml/data_extraction_rules.xml", "lang": "xml", "size": 552, "desc": "Data extraction rules"}, {"path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml", "lang": "xml", "size": 344, "desc": "Adaptive icon launcher definition"}, {"path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml", "lang": "xml", "size": 344, "desc": "Adaptive round icon definition"}, {"path": "app/src/main/res/mipmap-hdpi/ic_launcher.webp", "lang": "image", "size": 2096, "desc": "Launcher icon (hdpi, 72x72)"}, {"path": "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp", "lang": "image", "size": 4305, "desc": "Round launcher icon (hdpi)"}, {"path": "app/src/main/res/mipmap-mdpi/ic_launcher.webp", "lang": "image", "size": 1485, "desc": "Launcher icon (mdpi, 48x48)"}, {"path": "app/src/main/res/mipmap-mdpi/ic_launcher_round.webp", "lang": "image", "size": 2634, "desc": "Round launcher icon (mdpi)"}, {"path": "app/src/main/res/mipmap-xhdpi/ic_launcher.webp", "lang": "image", "size": 2854, "desc": "Launcher icon (xhdpi, 96x96)"}, {"path": "app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp", "lang": "image", "size": 5934, "desc": "Round launcher icon (xhdpi)"}, {"path": "app/src/main/res/mipmap-xxhdpi/ic_launcher.webp", "lang": "image", "size": 4360, "desc": "Launcher icon (xxhdpi, 144x144)"}, {"path": "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp", "lang": "image", "size": 8887, "desc": "Round launcher icon (xxhdpi)"}, {"path": "app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp", "lang": "image", "size": 5743, "desc": "Launcher icon (xxxhdpi, 192x192)"}, {"path": "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp", "lang": "image", "size": 11709, "desc": "Round launcher icon (xxxhdpi)"}];
+
+// ── Stats ──
+const counts = {kotlin:0, python:0, shell:0, xml:0, audio:0, image:0};
+FILES.forEach(f => counts[f.lang]++);
+const totalSize = FILES.reduce((s,f) => s+f.size, 0);
+
+let statsHTML = `
+  <div class="stat-pill"><span class="dot kt"></span><span class="count">${counts.kotlin}</span><span class="label">Kotlin</span></div>
+  <div class="stat-pill"><span class="dot py"></span><span class="count">${counts.python}</span><span class="label">Python</span></div>
+  <div class="stat-pill"><span class="dot sh"></span><span class="count">${counts.shell}</span><span class="label">Shell</span></div>
+  <div class="stat-pill"><span class="dot" style="background:var(--xml)"></span><span class="count">${counts.xml}</span><span class="label">XML</span></div>
+  <div class="stat-pill"><span class="dot" style="background:var(--audio)"></span><span class="count">${counts.audio}</span><span class="label">Audio</span></div>
+  <div class="stat-pill"><span class="dot" style="background:var(--image)"></span><span class="count">${counts.image}</span><span class="label">Image</span></div>
+  <div class="stat-pill"><span class="count">${(totalSize/1024/1024).toFixed(1)}</span><span class="label">MB total</span></div>
+`;
+document.getElementById('headerStats').innerHTML = statsHTML;
+
+// ── Build Tree ──
+function buildTree(files) {
+  const root = {name:'', children:{}, files:[]};
+  files.forEach(f => {
+    const parts = f.path.split('/');
+    let node = root;
+    for (let i=0; i<parts.length-1; i++) {
+      const p = parts[i];
+      if (!node.children[p]) node.children[p] = {name:p, children:{}, files:[]};
+      node = node.children[p];
+    }
+    node.files.push(f);
+  });
+  return root;
+}
+
+function renderTree(node, container, depth=0, prefix='', itemIndex={val:0}) {
+  const childDirs = Object.keys(node.children).sort();
+  const childFiles = node.files.sort((a,b) => a.path.localeCompare(b.path));
+
+  childDirs.forEach(dirName => {
+    const child = node.children[dirName];
+    const dirId = prefix + dirName + '/';
+    const dirEl = document.createElement('div');
+    dirEl.className = 'tree-node';
+    dirEl.dataset.dir = dirId;
+
+    const row = document.createElement('div');
+    row.className = 'tree-row folder';
+    row.style.paddingLeft = (12 + depth * 16) + 'px';
+    row.style.setProperty('--i', itemIndex.val++);
+    row.innerHTML = `
+      <span class="chevron">&#9654;</span>
+      <span class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+      <span class="name">${dirName}</span>
+    `;
+
+    const childrenEl = document.createElement('div');
+    childrenEl.className = 'tree-children';
+
+    row.addEventListener('click', () => {
+      dirEl.classList.toggle('expanded');
+      row.classList.toggle('expanded');
+    });
+
+    dirEl.appendChild(row);
+    dirEl.appendChild(childrenEl);
+    container.appendChild(dirEl);
+
+    renderTree(child, childrenEl, depth+1, dirId, itemIndex);
+  });
+
+  childFiles.forEach(f => {
+    const fileName = f.path.split('/').pop();
+    const fileEl = document.createElement('div');
+    fileEl.className = 'tree-row file ' + f.lang;
+    fileEl.style.paddingLeft = (12 + depth * 16 + 22) + 'px';
+    fileEl.style.setProperty('--i', itemIndex.val++);
+    fileEl.dataset.path = f.path;
+    fileEl.dataset.lang = f.lang;
+    fileEl.dataset.size = f.size;
+
+    const sizeStr = f.size === 0 ? '0 B' : f.size < 1024 ? f.size + ' B' : (f.size/1024).toFixed(1) + ' KB';
+
+    fileEl.innerHTML = `
+      <span class="lang-dot ${f.lang}"></span>
+      <span class="name">${fileName}</span>
+      <span class="size">${sizeStr}</span>
+    `;
+
+    fileEl.addEventListener('click', () => loadFile(f));
+
+    container.appendChild(fileEl);
+  });
+}
+
+const treeRoot = document.getElementById('treeRoot');
+renderTree(buildTree(FILES), treeRoot);
+
+// Auto-expand first level
+setTimeout(() => {
+  const firstLevel = treeRoot.querySelectorAll(':scope > .tree-node');
+  firstLevel.forEach(n => {
+    n.classList.add('expanded');
+    n.querySelector('.tree-row').classList.add('expanded');
+  });
+}, 300);
+
+// ── File Loading ──
+let currentFile = null;
+let currentCode = '';
+
+async function loadFile(file) {
+  if (currentFile && currentFile.path === file.path) return;
+  currentFile = file;
+
+  // Update active state
+  document.querySelectorAll('.tree-row.file.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll(`.tree-row.file[data-path="${file.path}"]`).forEach(el => el.classList.add('active'));
+
+  // Show header
+  const vHeader = document.getElementById('viewerHeader');
+  const vBadge = document.getElementById('viewerBadge');
+  const vPath = document.getElementById('viewerPath');
+  const vSize = document.getElementById('viewerSize');
+  const copyBtn = document.getElementById('copyBtn');
+
+  vHeader.style.display = 'flex';
+  vHeader.className = 'viewer-header ' + file.lang;
+  vBadge.className = 'viewer-lang-badge ' + file.lang;
+  const langLabels = {kotlin:'Kotlin', python:'Python', shell:'Shell', xml:'XML', audio:'Audio', image:'Image'};
+  vBadge.textContent = langLabels[file.lang] || file.lang;
+
+  // Path with dimmed directories
+  const parts = file.path.split('/');
+  const fileName = parts.pop();
+  vPath.innerHTML = `<span class="dim">${parts.join('/')}/</span>${fileName}`;
+
+  const sizeStr = file.size === 0 ? '0 B' : file.size < 1024 ? file.size + ' B' : (file.size/1024).toFixed(1) + ' KB';
+  vSize.textContent = sizeStr;
+  // Hide copy for binary files (audio, image)
+  copyBtn.style.display = (file.size === 0 || file.lang === 'audio' || file.lang === 'image') ? 'none' : 'flex';
+
+  // Show loading
+  const vBody = document.getElementById('viewerBody');
+  vBody.className = 'viewer-body lang-' + file.lang;
+
+  if (file.size === 0) {
+    vBody.innerHTML = '<div class="viewer-empty"><div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><h2>Empty file</h2><p>This file has no content.</p></div>';
+    currentCode = '';
+    return;
+  }
+
+  // ── Audio files: show audio player ──
+  if (file.lang === 'audio') {
+    const ext = file.path.split('.').pop().toUpperCase();
+    const fileName = file.path.split('/').pop();
+    vBody.innerHTML = `
+      <div class="audio-viewer">
+        <div class="audio-icon-wrap" id="audioIconWrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <div class="audio-title">${fileName}</div>
+        <div class="audio-desc">${file.desc}</div>
+        <div class="audio-player">
+          <audio controls preload="metadata" src="${file.path}" id="audioElement">
+            Your browser does not support audio playback.
+          </audio>
+          <div class="audio-info">
+            <span class="label">Size: ${sizeStr}</span>
+            <span class="format">${ext}</span>
+          </div>
+        </div>
+      </div>
+    `;
+    const audioEl = document.getElementById('audioElement');
+    const iconWrap = document.getElementById('audioIconWrap');
+    if (audioEl && iconWrap) {
+      audioEl.addEventListener('play', () => iconWrap.classList.add('playing'));
+      audioEl.addEventListener('pause', () => iconWrap.classList.remove('playing'));
+      audioEl.addEventListener('ended', () => iconWrap.classList.remove('playing'));
+      audioEl.addEventListener('error', () => {
+        iconWrap.classList.remove('playing');
+        vBody.innerHTML = `
+          <div class="viewer-error">
+            <div class="err-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <h3>Unable to load audio</h3>
+            <p>This audio file couldn't be loaded. This usually happens when viewing the HTML locally instead of through a web server.</p>
+            <a class="github-link" href="https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/${file.path}" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+              View on GitHub
+            </a>
+          </div>
+        `;
+      });
+    }
+    currentCode = '';
+    return;
+  }
+
+  // ── Image files: show preview ──
+  if (file.lang === 'image') {
+    const fileName = file.path.split('/').pop();
+    vBody.innerHTML = `
+      <div class="image-viewer">
+        <img src="${file.path}" alt="${fileName}" onerror="this.style.display='none';document.getElementById('imgFallback').style.display='flex'">
+        <div class="image-info">
+          <div class="title">${fileName}</div>
+          <div class="desc">${file.desc} &middot; ${sizeStr}</div>
+        </div>
+        <div id="imgFallback" style="display:none" class="viewer-error">
+          <div class="err-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <h3>Unable to load image</h3>
+          <p>This image couldn't be loaded. This usually happens when viewing the HTML locally instead of through a web server.</p>
+          <a class="github-link" href="https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/${file.path}" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    `;
+    currentCode = '';
+    return;
+  }
+
+  // ── Code files (kotlin, python, shell, xml): fetch and display ──
+  vBody.innerHTML = '<div class="viewer-loading">' + '<div class="shimmer-line"></div>'.repeat(20) + '</div>';
+
+  try {
+    const response = await fetch(file.path);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const code = await response.text();
+    currentCode = code;
+    displayCode(code, file.lang);
+  } catch(err) {
+    vBody.innerHTML = `
+      <div class="viewer-error">
+        <div class="err-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h3>Unable to load file</h3>
+        <p>This file can't be fetched directly. This usually happens when viewing the HTML locally instead of through a web server.</p>
+        <a class="github-link" href="https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/${file.path}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          View on GitHub
+        </a>
+      </div>
+    `;
+    currentCode = '';
+  }
+}
+
+function displayCode(code, lang) {
+  const vBody = document.getElementById('viewerBody');
+  vBody.className = 'viewer-body lang-' + lang;
+
+  const lines = code.split('\n');
+  const lineNums = lines.map((_,i) => i+1).join('\n');
+
+  const hlLangMap = {kotlin:'kotlin', python:'python', shell:'bash', xml:'xml'};
+  const hlLang = hlLangMap[lang] || 'plaintext';
+
+  vBody.innerHTML = `
+    <div class="code-wrap">
+      <div class="line-numbers">${lineNums}</div>
+      <div class="code-content">
+        <pre><code class="language-${hlLang}">${escapeHtml(code)}</code></pre>
+      </div>
+    </div>
+  `;
+
+  // Apply highlighting
+  const codeEl = vBody.querySelector('pre code');
+  if (window.hljs) {
+    hljs.highlightElement(codeEl);
+  }
+
+  // Smooth fade-in
+  const wrap = vBody.querySelector('.code-wrap');
+  wrap.style.opacity = '0';
+  wrap.style.transform = 'translateY(8px)';
+  wrap.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  requestAnimationFrame(() => {
+    wrap.style.opacity = '1';
+    wrap.style.transform = 'translateY(0)';
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ── Copy Button ──
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  if (!currentCode) return;
+  try {
+    await navigator.clipboard.writeText(currentCode);
+    const btn = document.getElementById('copyBtn');
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+    }, 2000);
+  } catch(e) {
+    console.error('Copy failed:', e);
+  }
+});
+
+// ── Search Filter ──
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const query = searchInput.value.toLowerCase().trim();
+  const activeFilter = document.querySelector('.filter-tab.active').dataset.filter;
+
+  document.querySelectorAll('.tree-row.file').forEach(row => {
+    const path = row.dataset.path.toLowerCase();
+    const lang = row.dataset.lang;
+    const matchesQuery = !query || path.includes(query);
+    const matchesFilter = activeFilter === 'all' || lang === activeFilter;
+    const visible = matchesQuery && matchesFilter;
+    row.style.display = visible ? '' : 'none';
+
+    // Show/hide parent folders
+    if (visible) {
+      let parent = row.parentElement;
+      while (parent && parent !== treeRoot) {
+        if (parent.classList.contains('tree-node')) {
+          parent.style.display = '';
+          parent.classList.add('expanded');
+          parent.querySelector('.tree-row')?.classList.add('expanded');
+        }
+        parent = parent.parentElement;
+      }
+    }
+  });
+
+  // Hide empty folders
+  if (query) {
+    document.querySelectorAll('.tree-node').forEach(node => {
+      const hasVisibleFiles = node.querySelector('.tree-row.file:not([style*="display: none"])');
+      const childNodes = node.querySelectorAll('.tree-node');
+      let hasVisibleChildren = false;
+      childNodes.forEach(cn => {
+        if (cn.querySelector('.tree-row.file:not([style*="display: none"])')) hasVisibleChildren = true;
+      });
+      if (!hasVisibleFiles && !hasVisibleChildren) {
+        node.style.display = 'none';
+      }
+    });
+  } else {
+    document.querySelectorAll('.tree-node').forEach(node => {
+      node.style.display = '';
+    });
+  }
+});
+
+// ── Language Filter Tabs ──
+document.querySelectorAll('.filter-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    // Trigger search to re-filter
+    searchInput.dispatchEvent(new Event('input'));
+  });
+});
+
+// ── Keyboard: Escape to close viewer header ──
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && currentFile) {
+    document.querySelectorAll('.tree-row.file.active').forEach(el => el.classList.remove('active'));
+    document.getElementById('viewerHeader').style.display = 'none';
+    document.getElementById('viewerBody').className = 'viewer-body';
+    document.getElementById('viewerBody').innerHTML = `
+      <div class="viewer-empty">
+        <div class="icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+        </div>
+        <h2>Select a file to view</h2>
+        <p>Click any file in the tree to load its source code with syntax highlighting.</p>
+        <div class="hint">
+          <span style="color:var(--kotlin)">Kotlin</span>
+          <span style="color:var(--python)">Python</span>
+          <span style="color:var(--shell)">Shell</span>
+        </div>
+      </div>
+    `;
+    currentFile = null;
+  }
+});
+</script>
+</body>
+</html>
